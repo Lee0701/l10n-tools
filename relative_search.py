@@ -6,6 +6,7 @@ katakana = 'アイウエオカキクケコサシスセソタチツテトナニ�
 katakana_voiced = 'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ'
 hiragana_voiced = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ'
 
+min_search_len = 3
 max_charcode = 0xff
 
 def make_pattern(table, str):
@@ -50,4 +51,7 @@ def main(input_file, search_str):
 if __name__ == '__main__':
     args = sys.argv[1:]
     input_file, search_str = args
-    main(input_file, search_str)
+    if len(search_str) < min_search_len:
+        print('Search string must be at least %d characters long.' % min_search_len)
+    else:
+        main(input_file, search_str)
