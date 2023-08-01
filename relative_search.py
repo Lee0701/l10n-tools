@@ -88,5 +88,6 @@ def search_pattern(data, pattern):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    input_file, search_str = args
+    input_file = args.pop(0)
+    search_str = ' '.join(args)
     main(input_file, search_str)
