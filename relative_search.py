@@ -1,17 +1,7 @@
 
 import sys
 
-hiragana = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
-katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'
-katakana_voiced = 'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ'
-hiragana_voiced = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ'
-
-pattern_tables = {
-    'あ': hiragana,
-    'が': hiragana_voiced,
-    'ア': katakana,
-    'ガ': katakana_voiced,
-}
+from consts import pattern_tables
 
 max_charcode = 0xff
 
@@ -44,8 +34,13 @@ def main(input_file, search_str):
 
         text = [c if isinstance(c, str) else '{%02x}' % c for c in text]
         text = ''.join(text)
+
+        table_gen_params = ['%s=%02x' % (table, offset) for table, offset in result_list]
+        table_gen_params = ','.join(table_gen_params)
+
         print('Text:', text)
         print('Raw Text:', raw_text)
+        print('Parameters for table generation:', table_gen_params)
         print()
 
 def search_multiple_pattern_tables(search_str, pattern_tables, data):
@@ -103,9 +98,12 @@ def search_pattern(data, pattern):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
+    if len(args) < 2:
+        print('Usage: python search.py <input_file> <search_str...>')
+        exit(1)
     input_file = args.pop(0)
     search_str = ' '.join(args)
-    if len([c for c in search_str if c not in hiragana + hiragana_voiced + katakana + katakana_voiced + ' 　']) > 0:
+    if len([c for c in search_str if c not in ''.join(pattern_tables.values()) + ' 　']) > 0:
         print('Only large hiragana/katakana/spaces are allowed in search.')
         print('Fullwidth/halfwidth spaces are treated as wildacards.')
         exit()
