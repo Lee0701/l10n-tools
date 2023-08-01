@@ -99,7 +99,7 @@ def search_pattern(data, pattern):
 if __name__ == '__main__':
     args = sys.argv[1:]
     if len(args) < 2:
-        print('Usage: python search.py <input_file> <search_str...>')
+        print('Usage: python relative_search.py <input_file> <search_str...>')
         exit(1)
     input_file = args.pop(0)
     search_str = ' '.join(args)
