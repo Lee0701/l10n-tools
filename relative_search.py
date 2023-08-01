@@ -19,7 +19,37 @@ def main(input_file, search_str):
     with open(input_file, 'rb') as f:
         data = list(bytearray(f.read()))
     
-    common_results = {}
+    common_results = search_multiple_pattern_tables(search_str, pattern_tables, data)
+
+    for result_addr, result_list in common_results:
+        if len(result_list) == 0:
+            continue
+
+        raw_text = data[result_addr:result_addr+len(search_str)]
+        raw_text = ['$%02x' % c for c in raw_text]
+        raw_text = ' '.join(raw_text)
+
+        text = data[result_addr:result_addr+len(search_str)]
+
+        print('**', 'At ROM', '$%04x' % result_addr, '**')
+        for result in result_list:
+            table_name, display_offset = result
+            pattern_table = pattern_tables[table_name]
+
+            sliced_data = data[result_addr:result_addr+len(search_str)]
+            sliced_data = [c - display_offset if isinstance(c, int) else c for c in sliced_data]
+            text = [pattern_table[c] if isinstance(c, int) and c in range(len(pattern_table)) else text[i] for i, c in enumerate(sliced_data)]
+
+            print('Table', table_name, 'Offset:', '$%02x' % display_offset)
+
+        text = [c if isinstance(c, str) else '{%02x}' % c for c in text]
+        text = ''.join(text)
+        print('Text:', text)
+        print('Raw Text:', raw_text)
+        print()
+
+def search_multiple_pattern_tables(search_str, pattern_tables, data):
+    results = {}
 
     for table_name, pattern_table in pattern_tables.items():
         offset, search_results = search_pattern_table(search_str, pattern_table, data)
@@ -32,39 +62,13 @@ def main(input_file, search_str):
             # 찾은 文字列과 周邊 텍스트를 表示할때 使用할 테이블別 오프셋을 求한다.
             display_offset = result_offset - offset
             # 찾아진 住所別로 그룹化
-            if result_addr not in common_results:
-                common_results[result_addr] = []
-            common_results[result_addr].append((table_name, display_offset))
+            if result_addr not in results:
+                results[result_addr] = []
+            results[result_addr].append((table_name, display_offset))
 
-    common_results = sorted(common_results.items(), key=lambda x: len(x[1]), reverse=False)
+    results = sorted(results.items(), key=lambda x: len(x[1]), reverse=False)
+    return results
 
-    for result_addr, result_list in common_results:
-        if len(result_list) == 0:
-            continue
-
-        raw_text = data[result_addr:result_addr+len(search_str)]
-        raw_text = ['$%02x' % c for c in raw_text]
-        raw_text = ' '.join(raw_text)
-
-        text = data[result_addr:result_addr+len(search_str)]
-
-        print('**', 'At', '$%04x' % result_addr)
-        for result in result_list:
-            table_name, display_offset = result
-            pattern_table = pattern_tables[table_name]
-
-            sliced_data = data[result_addr:result_addr+len(search_str)]
-            sliced_data = [c - display_offset if isinstance(c, int) else c for c in sliced_data]
-            print(sliced_data)
-            text = [pattern_table[c] if isinstance(c, int) and c in range(len(pattern_table)) else text[i] for i, c in enumerate(sliced_data)]
-
-            print('Table', table_name, 'Offset:', '$%02x' % display_offset)
-
-        text = [c if isinstance(c, str) else '{%02x}' % c for c in text]
-        text = ''.join(text)
-        print('Text:', text)
-        print('Raw Text:', raw_text)
-        print()
 
 def search_pattern_table(search_str, pattern_table, data):
     # 檢索할 文字列의 인덱스들을 첫 文字에 對한 差異들의 패턴으로 表現한다.
