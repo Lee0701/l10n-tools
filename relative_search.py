@@ -13,10 +13,7 @@ pattern_tables = {
     'ガ': katakana_voiced,
 }
 
-min_search_len = 3
 max_charcode = 0xff
-lookbehind = 4
-lookahead = 12
 
 def main(input_file, search_str):
     with open(input_file, 'rb') as f:
@@ -32,8 +29,9 @@ def main(input_file, search_str):
 
         for result in search_results:
             result_offset, result_addr = result
-            # 찾은 文字列과 周邊 텍스트를 表示할때 使用할 오프셋을 求한다.
+            # 찾은 文字列과 周邊 텍스트를 表示할때 使用할 테이블別 오프셋을 求한다.
             display_offset = result_offset - offset
+            # 찾아진 住所別로 그룹化
             if result_addr not in common_results:
                 common_results[result_addr] = []
             common_results[result_addr].append((table_name, display_offset))
@@ -45,19 +43,16 @@ def main(input_file, search_str):
         for result in result_list:
             table_name, display_offset = result
             pattern_table = pattern_tables[table_name]
-
-            surrounding_data = data[result_addr - lookbehind : result_addr + lookahead]
-            surrounding_data_raw = ['%02x' % d for d in surrounding_data]
-            surrounding_data_raw = ' '.join(surrounding_data_raw)
-            surrounding_data = [c + display_offset for c in surrounding_data]
-            surrounding_data = [format(pattern_table, d) for d in surrounding_data]
-            surrounding_data = ''.join(surrounding_data)
+    
+            text = data[result_addr:result_addr+len(search_str)]
+            text = [c + display_offset for c in text]
+            text = [pattern_table[c] if c in range(len(pattern_table)) else '{%02x}' % c for c in text]
+            text = ''.join(text)
 
             print('**', 'Table', table_name)
             print('Addr', ':', '$%04x' % result_addr)
             print('Offset', ':', display_offset)
-            print('', surrounding_data)
-            print('', surrounding_data_raw)
+            print('Text', ':', text)
             print()
 
 def search_pattern_table(search_str, pattern_table, data):
@@ -78,23 +73,18 @@ def search_pattern(data, pattern):
     pattern_len = len(pattern)
     if pattern.count(None) == pattern_len:
         return found
+    first_not_none = [i for i, d in enumerate(pattern) if d is not None][0]
     for index in range(len(data) - pattern_len):
         # 檢索할 패턴의 길이만큼 자른다.
         sliced_data = data[index : index+pattern_len]
-        offset = -sliced_data[0]
+        offset = -sliced_data[first_not_none]
         # 잘라낸 部分을 그 첫 글字에 對한 오프셋들로 變換.
         data_pattern = [d + offset for d in sliced_data]
-        pattern_with_dc = [d if d is not None else data_pattern[i] for i, d in enumerate(pattern)]
+        data_pattern = [None if pattern[i] is None else data_pattern[i] for i in range(pattern_len)]
         # 두 값이 一致하면 檢索結果에 包含.
-        if data_pattern == pattern_with_dc:
+        if data_pattern == pattern:
             found.append((offset, index))
     return found
-
-def format(pattern_table, d):
-    if d in range(len(pattern_table)):
-        return pattern_table[d]
-    else:
-        return '{%02x}' % d
 
 if __name__ == '__main__':
     args = sys.argv[1:]
