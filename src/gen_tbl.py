@@ -16,7 +16,7 @@ def main(gen_params, out_file):
 if __name__ == '__main__':
     args = sys.argv[1:]
     if len(args) < 2:
-        print('Usage: python gen_pattern_tables.py <params> <out_file>')
+        print('Usage: python %s <params> <out_file>' % sys.argv[0])
         exit(1)
     params = args.pop(0)
     params = [item.strip().split('=') for item in params.split(',')]
