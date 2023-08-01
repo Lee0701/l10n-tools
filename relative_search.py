@@ -90,4 +90,7 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     input_file = args.pop(0)
     search_str = ' '.join(args)
+    if len([c for c in search_str if c not in hiragana + hiragana_voiced + katakana + katakana_voiced + ' 　']) > 0:
+        print('Only large hiragana/katakana/spaces are allowed in search.')
+        exit()
     main(input_file, search_str)
