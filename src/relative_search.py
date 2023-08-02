@@ -5,7 +5,7 @@ from consts import pattern_tables
 
 max_charcode = 0xff
 
-def main(input_file, search_str):
+def relative_search(input_file, search_str):
     with open(input_file, 'rb') as f:
         data = list(bytearray(f.read()))
     
@@ -96,7 +96,7 @@ def search_pattern(data, pattern):
             found.append((offset, index))
     return found
 
-if __name__ == '__main__':
+def main():
     args = sys.argv[1:]
     if len(args) < 2:
         print('Usage: python %s <input_file> <search_str...>' % sys.argv[0])
@@ -107,4 +107,7 @@ if __name__ == '__main__':
         print('Only large hiragana/katakana/spaces are allowed in search.')
         print('Fullwidth/halfwidth spaces are treated as wildacards.')
         exit()
-    main(input_file, search_str)
+    relative_search(input_file, search_str)
+
+if __name__ == '__main__':
+    main()

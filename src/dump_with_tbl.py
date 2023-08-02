@@ -5,7 +5,7 @@ from functions import load_tbl
 
 line_len = 16
 
-def main(tbl_file, input_file, output_file):
+def dump_with_tbl(tbl_file, input_file, output_file):
     with open(input_file, 'rb') as f:
         data = list(bytearray(f.read()))
     tbl = load_tbl(tbl_file)
@@ -24,10 +24,13 @@ def main(tbl_file, input_file, output_file):
     with open(output_file, 'w') as f:
         f.write(result)
 
-if __name__ == "__main__":
+def main():
     args = sys.argv[1:]
     if len(args) != 3:
         print("Usage: python %s <tbl_file> <input_file> <output_file>" % sys.argv[0])
         sys.exit(1)
     tbl_file, input_file, output_file = args
-    main(tbl_file, input_file, output_file)
+    dump_with_tbl(tbl_file, input_file, output_file)
+
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,11 @@
 
 import sys
 
-def main(file_name):
+def find_pointer_table(file_name):
     with open(file_name, 'rb') as f:
         data = list(bytearray(f.read()))
+
+    results = []
 
     i = 0
     while i < len(data):
@@ -20,15 +22,21 @@ def main(file_name):
                 break
         if len(values) > 32:
             values.pop(0)
-            print('**', 'At ROM', ('$%04x' % addr), '**')
-            print(', '.join(['$%04x' % v for v in values]))
-            print()
+            results.append((addr, values))
         i = j
+    return results
 
-if __name__ == "__main__":
+def main():
     args = sys.argv[1:]
     if len(args) < 1:
         print("Usage: python %s <file_name>" % sys.argv[0])
         sys.exit(1)
     file_name = args.pop(0)
-    main(file_name)
+    results = find_pointer_table(file_name)
+    for addr, values in results:
+        print('**', 'At ROM', ('$%04x' % addr), '**')
+        print(', '.join(['$%04x' % v for v in values]))
+        print()
+
+if __name__ == "__main__":
+    main()
