@@ -20,9 +20,7 @@ def dump_with_tbl(tbl_file, input_file, output_file):
 
     lines = [addr + ' '.join(v) + '  ' + ''.join(c) for addr, v, c in lines]
     result = '\n'.join(lines) + '\n'
-
-    with open(output_file, 'w') as f:
-        f.write(result)
+    return result
 
 def main():
     args = sys.argv[1:]
@@ -30,7 +28,9 @@ def main():
         print("Usage: python %s <tbl_file> <input_file> <output_file>" % sys.argv[0])
         sys.exit(1)
     tbl_file, input_file, output_file = args
-    dump_with_tbl(tbl_file, input_file, output_file)
+    result = dump_with_tbl(tbl_file, input_file, output_file)
+    with open(output_file, 'w') as f:
+        f.write(result)
 
 if __name__ == "__main__":
     main()

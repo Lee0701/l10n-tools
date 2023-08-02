@@ -10,8 +10,7 @@ def generate_tbl(gen_params, out_file):
         for i, c in enumerate(pattern_table):
             result.append('%02x=%s' % (i + offset, c))
     result = '\n'.join(result)
-    with open(out_file, 'w') as f:
-        f.write(result)
+    return result
 
 def main():
     args = sys.argv[1:]
@@ -22,7 +21,9 @@ def main():
     params = [item.strip().split('=') for item in params.split(',')]
     params = {k: int(v, 16) for k, v in params}
     out_file = args.pop(0)
-    generate_tbl(params, out_file)
+    result = generate_tbl(params, out_file)
+    with open(out_file, 'w') as f:
+        f.write(result)
 
 if __name__ == '__main__':
     main()
