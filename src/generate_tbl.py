@@ -3,7 +3,7 @@ import sys
 
 from consts import pattern_tables
 
-def generate_tbl(gen_params, out_file):
+def generate_tbl(gen_params):
     result = []
     for table_id, offset in gen_params.items():
         pattern_table = pattern_tables[table_id]
@@ -21,7 +21,7 @@ def main():
     params = [item.strip().split('=') for item in params.split(',')]
     params = {k: int(v, 16) for k, v in params}
     out_file = args.pop(0)
-    result = generate_tbl(params, out_file)
+    result = generate_tbl(params)
     with open(out_file, 'w') as f:
         f.write(result)
 
