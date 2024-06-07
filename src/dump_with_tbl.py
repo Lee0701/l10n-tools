@@ -1,7 +1,7 @@
 
 import sys
 
-from functions import load_tbl
+from tbl import load_tbl
 
 line_len = 16
 
@@ -16,7 +16,7 @@ def dump_with_tbl(tbl_file, input_file):
             addr = '$' + ('%04x' % i).ljust(8, ' ')
             lines.append((addr, [], []))
         lines[-1][1].append('%02x' % b)
-        lines[-1][2].append(tbl[b] if b in tbl else '.')
+        lines[-1][2].append(tbl[b] if b in tbl and tbl[b] != '' else f'<{hex(b)[2:]}>')
 
     lines = [addr + ' '.join(v) + '  ' + ''.join(c) for addr, v, c in lines]
     result = '\n'.join(lines) + '\n'
