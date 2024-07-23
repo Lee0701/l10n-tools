@@ -29,7 +29,7 @@ def main():
         sys.exit(1)
     tbl_file, input_file, output_file = args
     result = dump_with_tbl(tbl_file, input_file)
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write(result)
 
 if __name__ == "__main__":

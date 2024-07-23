@@ -1,6 +1,6 @@
 
 def load_tbl(filename):
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         data = f.readlines()
     data = [line.replace('\r', '').replace('\n', '') for line in data]
     data = [line for line in data if len(line) > 0]

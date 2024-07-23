@@ -8,7 +8,7 @@ max_charcode = 0xff
 def relative_search(input_file, search_str):
     with open(input_file, 'rb') as f:
         data = list(bytearray(f.read()))
-    
+
     common_results = search_multiple_pattern_tables(search_str, pattern_tables, data)
 
     for result_addr, result_list in common_results:

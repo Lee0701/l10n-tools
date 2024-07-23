@@ -22,7 +22,7 @@ def main():
     params = {k: int(v, 16) for k, v in params}
     out_file = args.pop(0)
     result = generate_tbl(params)
-    with open(out_file, 'w') as f:
+    with open(out_file, 'w', encoding='utf-8') as f:
         f.write(result)
 
 if __name__ == '__main__':
