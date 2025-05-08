@@ -16,7 +16,20 @@ def dump_with_tbl(tbl_file, input_file):
             addr = '$' + ('%04x' % i).ljust(8, ' ')
             lines.append((addr, [], []))
         lines[-1][1].append('%02x' % b)
-        lines[-1][2].append(tbl[b] if b in tbl and tbl[b] != '' else f'<{b:02x}>')
+
+    i = 0
+    while i < len(data):
+        line = lines[i // line_len][2]
+        for k in range(8, 0, -1):
+            b = int.from_bytes(bytearray(data[i:i+k]))
+            if b in tbl:
+                line.append(tbl[b])
+                i += k
+                break
+        else:
+            b = data[i]
+            line.append(f'<{b:02x}>')
+            i += 1
 
     lines = [addr + ' '.join(v) + '  ' + ''.join(c) for addr, v, c in lines]
     result = '\n'.join(lines) + '\n'
